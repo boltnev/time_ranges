@@ -1,7 +1,50 @@
-class WrongTimeRangeError < Exception; end
 
 WRONG_ARG = "is not time"
-
+# the TimeRange 
+# 
+# helps in Issues with time time ranges,
+# such as intersecton of time ranges,
+# union of time ranges, etc.
+# 
+# == Examples
+#   require "time_range"
+#
+#   range = TimeRange.new(Time.now - 1000, Time.now + 1000)
+#   # => 2013-09-13 23:32:16 +0400..2013-09-14 00:05:36 +0400
+#   today = TimeRange.for_date(Date.today)
+#   # =>  2013-09-13 00:00:00 +0400..2013-09-13 23:59:59 +0400
+#
+# Check time presence in time range
+#   range.include?(Time.now)
+#   # => true
+# 
+# Check time range presense in another time_range
+#   range2 = TimeRange.new(Time.now - 10, Time.now + 10)
+#   # => 2013-09-13 23:50:31 +0400..2013-09-13 23:50:51 +0400
+# 
+#   range.fully_include?(range2)
+#   # => true
+#
+# Check time ranges intersects each other:
+#   range.intersects?(range2)
+#   # => true
+#
+# Intersect time ranges
+#   range.intersection(range2)
+#   # => 2013-09-13 23:50:31 +0400..2013-09-13 23:50:51 +0400 # i.e equal range2
+#
+# Union time ranges 
+#   range3 = TimeRange.new(Time.now + 10000, Time.now + 20000)
+#   TimeRange.union(range, range2, range3)
+#   # => [2013-09-13 23:32:16 +0400..2013-09-14 00:05:36 +0400, 
+#   #     2013-09-14 02:41:17 +0400..2013-09-14 05:27:57 +0400]
+#
+# Subtract time ranges from one time range
+#   TimeRange.for_date(Date.today).subtract(TimeRange.new(Time.now + 900, Time.now + 1200),    
+#                                           TimeRange.new(Time.now + 300, Time.now + 600))
+#   # => [2013-09-14 00:00:00 +0400..2013-09-14 00:55:51 +0400, 
+#   #     2013-09-14 01:00:51 +0400..2013-09-14 01:05:51 +0400, 
+#   #     2013-09-14 01:10:51 +0400..2013-09-14 23:59:59 +0400]
 class TimeRange < Range
 
   alias_method :orig_init, :initialize
@@ -29,7 +72,7 @@ class TimeRange < Range
   end
 
   def subtract(*ranges)
-    ranges = ranges.flatten
+    ranges = ranges.flatten.sort{|a, b| a.begin <=> b.begin}
     return self if ranges.empty?
     result = []
     ranges.each do |range|
@@ -48,7 +91,7 @@ class TimeRange < Range
   end
 
   def self.for_date(date)
-    TimeRange.new(date.beginning_of_day, date.end_of_day)
+    TimeRange.new(date.to_time, (date + 1).to_time - 1)
   end
 
   def self.intersection(*tranges)
@@ -77,8 +120,9 @@ class TimeRange < Range
       tend =   [first.end, second.end].max
       return TimeRange.new(tbegin, tend)
     elsif tranges.count > 2
-      return union([first, union(tranges[1..-1])].flatten).flatten unless first.intersects?(second)
-      return union([ union(first, second), union(tranges[2..-1])].flatten).flatten
+      return [ first, union(tranges[1..-1])].flatten unless first.intersects?(second)
+      result = union([ union(first, second), tranges[2..-1]])
+      return result.is_a?(Array) ? result.flatten : result
     end
   end
 end

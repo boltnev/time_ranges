@@ -1,4 +1,8 @@
-require File.expand_path('../../spec_helper', __FILE__)
+require 'spec_helper'
+require 'time_range'
+require 'date'
+
+DAY = 3600 * 24
 
 describe :time_range do
   let(:time_range) { TimeRange.new(Time.now - 10, Time.now + 10) }
@@ -43,12 +47,12 @@ describe :time_range do
   end
 
   context :time_ranges_interaction do
-    let(:time1){ Time.now - 1.day }
-    let(:time2){ Time.now + 1.day }
+    let(:time1){ Time.now - 1 * DAY }
+    let(:time2){ Time.now + 1 * DAY }
     let(:time3){ Time.now }
-    let(:time4){ Time.now + 2.day }
-    let(:time5){ Time.now + 5.days }
-    let(:time6){ Time.now + 7.days }
+    let(:time4){ Time.now + 2 * DAY }
+    let(:time5){ Time.now + 5 * DAY }
+    let(:time6){ Time.now + 7 * DAY }
 
     let(:time_range1) { TimeRange.new(time1, time2) }
     let(:time_range2) { TimeRange.new(time3, time4) }
@@ -85,6 +89,20 @@ describe :time_range do
       subtraction.should eq [TimeRange.new(time1, time3), TimeRange.new(time4, time5)]
     end
 
+    it '.subtract more complex' do
+      range = TimeRange.for_date(Date.today)
+      time1 = Time.now
+      time2 = Time.now + 100
+      time3 = Time.now + 200
+      time4 = Time.now + 300
+      range2 = TimeRange.new(time1, time2)   
+      range3 = TimeRange.new(time3, time4)
+
+      range.subtract(range2, range3).count.should eq 3   
+      range.subtract(TimeRange.new(Time.now + 400, Time.now + 500 ),
+                     TimeRange.new(Time.now + 300, Time.now + 350)).count.should eq 3
+    end
+
     it '.substract with empty array' do
       subtraction =  TimeRange.new(time1, time6).subtract([])
       subtraction.should eq TimeRange.new(time1, time6)
@@ -92,7 +110,7 @@ describe :time_range do
 
     context :class_methods do
       it 'self.for_date' do
-        TimeRange.for_date(Date.today).should eq TimeRange.new(Date.today.beginning_of_day, Date.today.end_of_day  )
+        TimeRange.for_date(Date.today).should eq TimeRange.new(Date.today.to_time, Date.today.to_time + DAY - 1) # end_of day
       end
 
       context :intersection  do
