@@ -1,13 +1,14 @@
-the TimeRange 
+# the TimeRange 
 
 helps in Issues with time time ranges,
 such as intersecton of time ranges,
 union of time ranges, etc.
-Installation 
+
+# Installation 
 
     gem install 'time_range'
 
-Examples
+# Examples
 
     require "time_range"
     range = TimeRange.new(Time.now - 1000, Time.now + 1000)
@@ -46,8 +47,8 @@ Union time ranges
 
 Subtract time ranges from one time range
 
-   TimeRange.for_date(Date.today).subtract(TimeRange.new(Time.now + 900, Time.now + 1200),    
+    TimeRange.for_date(Date.today).subtract(TimeRange.new(Time.now + 900, Time.now + 1200),    
                                            TimeRange.new(Time.now + 300, Time.now + 600))
-   # => [2013-09-14 00:00:00 +0400..2013-09-14 00:55:51 +0400, 
-   #     2013-09-14 01:00:51 +0400..2013-09-14 01:05:51 +0400, 
-   #     2013-09-14 01:10:51 +0400..2013-09-14 23:59:59 +0400]
+    # => [2013-09-14 00:00:00 +0400..2013-09-14 00:55:51 +0400, 
+    #     2013-09-14 01:00:51 +0400..2013-09-14 01:05:51 +0400, 
+    #     2013-09-14 01:10:51 +0400..2013-09-14 23:59:59 +0400]
