@@ -75,6 +75,8 @@ describe :time_range do
     it '.include?' do
       time_range1.include?(Time.now).should be_true
       time_range4.include?(Time.now).should be_false
+      time_range1.include?(Date.today).should be_true      
+      time_range4.include?(Date.today).should be_false
     end
 
     it '.fully_include?' do

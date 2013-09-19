@@ -17,6 +17,8 @@ WRONG_ARG = "is not time"
 # Check time presence in time range
 #   range.include?(Time.now)
 #   # => true
+#   range.include?(Date.today)
+#   # => true
 # 
 # Check time range presense in another time_range
 #   range2 = TimeRange.new(Time.now - 10, Time.now + 10)
@@ -64,7 +66,13 @@ class TimeRange < Range
   end
 
   def include?(time)
-    self.begin <= time && self.end >= time
+    if time.is_a?(Time)
+      self.begin <= time && self.end >= time
+    elsif time.is_a?(Date)
+      self.begin.to_date <= time && self.end.to_date >= time
+    else
+      raise WrongTimeRangeError, WRONG_ARG 
+    end
   end
 
   def fully_include?(time_rage)

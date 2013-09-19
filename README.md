@@ -20,6 +20,8 @@ Check time presence in time range
 
     range.include?(Time.now)
     # => true
+    range.include?(Date.today)
+    # => true
  
 Check time range presense in another time_range
 
