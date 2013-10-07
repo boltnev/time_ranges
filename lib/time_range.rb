@@ -24,6 +24,10 @@ WRONG_ARG = "is not time"
 #   range2 = TimeRange.new(Time.now - 10, Time.now + 10)
 #   # => 2013-09-13 23:50:31 +0400..2013-09-13 23:50:51 +0400
 # 
+# Calculate length of time_range in seconds 
+#   range2.length 
+#   # => 20.00000462 
+# 
 #   range.fully_include?(range2)
 #   # => true
 #
@@ -47,6 +51,10 @@ WRONG_ARG = "is not time"
 #   # => [2013-09-14 00:00:00 +0400..2013-09-14 00:55:51 +0400, 
 #   #     2013-09-14 01:00:51 +0400..2013-09-14 01:05:51 +0400, 
 #   #     2013-09-14 01:10:51 +0400..2013-09-14 23:59:59 +0400]
+#
+# Calculate sum of lengths for several time ranges
+#  TimeRange.sum_length(TimeRange.for_date(Date.today), TimeRange.for_date(Date.today + 1))
+#  => 172798.0 
 class TimeRange < Range
 
   alias_method :orig_init, :initialize
@@ -77,6 +85,10 @@ class TimeRange < Range
 
   def fully_include?(time_rage)
     self.include?(time_rage.begin) && self.include?(time_rage.end)
+  end
+
+  def length
+    self.end - self.begin
   end
 
   def subtract(*ranges)
@@ -133,4 +145,13 @@ class TimeRange < Range
       return result.is_a?(Array) ? result.flatten : result
     end
   end
+
+  def self.sum_length(tranges)
+    result = 0.0
+    tranges.each do |range|
+      result += range.length
+    end
+    result
+  end
+
 end

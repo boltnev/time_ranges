@@ -59,7 +59,7 @@ describe :time_range do
     let(:time_range3) { TimeRange.new(time1, time3) }
     let(:time_range4) { TimeRange.new(time2, time4) }
     let(:time_range5) { TimeRange.new(time5, time6) }
-
+    
     it '.intersects?' do
       time_range1.intersects?(time_range2).should be_true
       time_range2.intersects?(time_range1).should be_true
@@ -110,9 +110,17 @@ describe :time_range do
       subtraction.should eq TimeRange.new(time1, time6)
     end
 
+    it '.length' do
+      time_range1.length.round(2).should eq (2 * 24 * 3600) 
+    end
+
     context :class_methods do
       it 'self.for_date' do
         TimeRange.for_date(Date.today).should eq TimeRange.new(Date.today.to_time, Date.today.to_time + DAY - 1) # end_of day
+      end
+      
+      it '.sum_length' do
+        TimeRange.sum_length([time_range1, time_range2]).round(2).should eq (2 * 2 * 24 * 3600) 
       end
 
       context :intersection  do
@@ -138,7 +146,7 @@ describe :time_range do
           trange.should eq [time_range3, time_range4]
         end
       end
-
+      
       context(:multiple_union) do
 
         it '.union' do
